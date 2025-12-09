@@ -1,0 +1,19 @@
+# docker-compose.test.yml (Extensión para Testing)
+services:
+  postgres_test:
+    image: postgres:15-alpine
+    container_name: users_db_test
+    # Usar credenciales distintas
+    environment:
+      POSTGRES_DB: users_db_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    # Usar un puerto diferente al 5432 del base para evitar conflicto
+    ports:
+      - "5433:5432"
+    volumes:
+      # Usar un volumen de datos diferente
+      - postgres_test_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_test_data:
