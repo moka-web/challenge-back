@@ -2,7 +2,8 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
 import { PokemonClient, PokeApiPokemon } from '../clients/pokemon.client';
-import { Pokemon } from './entities/pokemon.entity';
+
+import { ApiBadRequestResponse, ApiConflictResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class UsersService {
@@ -63,65 +64,65 @@ export class UsersService {
   }
 
   // Métodos para pokemones usando el cliente
-  async addPokemonToUser(userId: number, pokemonIdOrName: number | string): Promise<{ pokemon: Pokemon; pokeApiData: PokeApiPokemon }> {
+  async addPokemonToUser(userId: number, pokemonId: number): Promise <PokeApiPokemon> {
     // Verificar que el usuario existe
     const user = await this.usersRepository.findById(userId);
+
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
     }
 
     // Obtener datos del pokemon de la PokeAPI usando el cliente
-    const pokeApiData = typeof pokemonIdOrName === 'number'
-      ? await this.pokemonClient.getPokemonById(pokemonIdOrName)
-      : await this.pokemonClient.getPokemonByName(pokemonIdOrName);
+    const pokeApiData = await this.pokemonClient.getPokemonById(pokemonId);
 
-    // Verificar si el usuario ya tiene este pokemon
-    const hasPokemon = await this.usersRepository.hasPokemon(userId, pokeApiData.id);
+    if(!pokeApiData){
+      throw new NotFoundException( ` el pokemon con el ID ${pokemonId} no existe `)
+    }
+
+
+    const hasPokemon = await this.usersRepository.hasPokemon(userId, pokemonId);
+    
     if (hasPokemon) {
       throw new ConflictException(`El usuario ya tiene el pokemon ${pokeApiData.name}`);
     }
 
-    // Guardar referencia en la BD
-    const pokemon = await this.usersRepository.addPokemonToUser(
-      userId,
-      pokeApiData.id,
-      pokeApiData.name
-    );
+    await this.usersRepository.addPokemonToUser( userId,pokemonId);
 
-    return { pokemon, pokeApiData };
+    const pokemonAdded = pokeApiData; 
+
+    return pokemonAdded; 
+    
   }
 
-  async removePokemonFromUser(userId: number, pokemonId: number): Promise<void> {
+  async removePokemonFromUser(userId: number, pokemonId: number): Promise<boolean> {
+
+
     const user = await this.usersRepository.findById(userId);
+    const hasPokemon = await this.usersRepository.hasPokemon(userId, pokemonId);
+
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
+
+    if (!hasPokemon) {
+      throw new NotFoundException(`El usuario no tiene el pokemon con id ${pokemonId} `);
     }
 
     const deleted = await this.usersRepository.removePokemonFromUser(userId, pokemonId);
-    if (!deleted) {
-      throw new NotFoundException(`El usuario no tiene el pokemon con ID ${pokemonId}`);
-    }
+
+    
+    return deleted
+ 
   }
 
-  async getUserPokemons(userId: number): Promise<Pokemon[]> {
-    const user = await this.usersRepository.findById(userId);
-    if (!user) {
-      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
-    }
+  async getUserPokemons(userId: number): Promise<Number[]> {
     return this.usersRepository.getUserPokemons(userId);
   }
 
-  async getUserPokemonsWithDetails(userId: number): Promise<Array<Pokemon & { details: PokeApiPokemon }>> {
-    const pokemons = await this.getUserPokemons(userId);
-    
-    const pokemonsWithDetails = await Promise.all(
-      pokemons.map(async (pokemon) => {
-        const details = await this.pokemonClient.getPokemonById(pokemon.pokemonId);
-        return { ...pokemon, details };
-      })
-    );
+  async getUserPokemonsWithDetails(userId: number){
+   
+    return this.usersRepository.getUserPokemonsWhitDetails(userId)
 
-    return pokemonsWithDetails;
   }
 }
 

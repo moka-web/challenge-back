@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
-import { Pokemon } from '../users/entities/pokemon.entity';
+
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { Pokemon } from '../users/entities/pokemon.entity';
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_DATABASE || 'users_db',
-      entities: [User, Pokemon],
+      entities: [User],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
   ],

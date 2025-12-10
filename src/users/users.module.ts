@@ -6,11 +6,11 @@ import { UsersService } from './users.service';
 import { UsersRepository } from './users.repository';
 import { PokemonClient } from '../clients/pokemon.client';
 import { User } from './entities/user.entity';
-import { Pokemon } from './entities/pokemon.entity';
+
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Pokemon]),
+    TypeOrmModule.forFeature([User]),
     HttpModule,
   ],
   controllers: [UsersController],

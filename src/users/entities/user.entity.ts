@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
-import { Pokemon } from './pokemon.entity';
 
  // @column pertence a TypeORM es para definir las columnas de la tabla
 
@@ -25,7 +24,6 @@ export class User {
   @ApiProperty({ description: 'Fecha de creación del usuario', example: '2024-01-01T00:00:00.000Z' })
   @CreateDateColumn({ type: 'timestamp' })
 
-
   createdAt: Date;
 
   @ApiProperty({ description: 'Contraseña del usuario', example: '123456' })
@@ -33,9 +31,20 @@ export class User {
   //esto no deberia estar en la base de datos pero lo dejo para que se pueda autenticar
   password: string;
 
-  @ApiProperty({ description: 'Lista de pokemones del usuario', type: () => [Pokemon] })
-  @OneToMany(() => Pokemon, (pokemon) => pokemon.user)
-  pokemons: Pokemon[];
+
+  @ApiProperty({
+    description: 'Lista de pokemones del usuario (IDs)',
+    example: [1, 5, 23],
+    type: [Number],
+  })
+
+  // @Column({ type: 'jsonb', nullable: true })
+  // pokemons: number[];
+
+
+  @Column('int', { array: true, default: [] })
+  pokemons: number[];
+
 
 }
 

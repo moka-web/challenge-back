@@ -4,7 +4,7 @@ import { App } from 'supertest/types';
 import { DataSource } from 'typeorm';
 import { PokemonClient } from '../src/clients/pokemon.client';
 import { User } from '../src/users/entities/user.entity';
-import { Pokemon } from '../src/users/entities/pokemon.entity';
+
 import {
   createTestModule,
   initializeTestApp,
@@ -203,106 +203,87 @@ describe('UsersController (e2e)', () => {
     });
   });
 
+  // ---------------------- POST /users/:id/pokemons ----------------------
   describe('/users/:id/pokemons (POST)', () => {
-    it('debería agregar un pokemon a un usuario por ID', async () => {
-      // Setup: crear usuario
-      const userRepo = dataSource.getRepository(User);
-      const user = await userRepo.save({
-        name: 'Pokemon Trainer',
-        email: 'trainer@test.com',
-        password: 'password123',
+      it('debería agregar un pokemon a un usuario por ID', async () => {
+        const userRepo = dataSource.getRepository(User);
+        const user = await userRepo.save({
+          name: 'Pokemon Trainer',
+          email: 'trainer@test.com',
+          password: 'password123',
+          pokemons: [], // importante: inicializar como array vacío
+        });
+
+        // Mock de la respuesta de PokeAPI
+        pokemonClientMock.getPokemonById.mockResolvedValue(mockPikachu);
+
+        const response = await request(app.getHttpServer())
+          .post(`/users/${user.id}/pokemons`)
+          .send({ pokemonId: 25 })
+          .expect(201);
+
+        // Tu controller/service devuelve los datos de la PokeAPI (pokeApiData)
+        expect(response.body).toEqual(mockPikachu);
+        expect(pokemonClientMock.getPokemonById).toHaveBeenCalledWith(25);
+
+        // Verificar persistencia: ahora user.pokemons contiene sólo IDs (number[])
+        const updatedUser = await userRepo.findOneBy({ id: user.id });
+
+        expect(Array.isArray(updatedUser?.pokemons)).toBeTruthy();
+        expect(updatedUser?.pokemons).toContain(25);
       });
 
-      // Mock de la respuesta de PokeAPI
-      pokemonClientMock.getPokemonById.mockResolvedValue(mockPikachu);
+      
 
-      const response = await request(app.getHttpServer())
-        .post(`/users/${user.id}/pokemons`)
-        .send({ pokemonId: 25 })
-        .expect(201);
+      it('debería retornar 404 cuando el usuario no existe', async () => {
+        pokemonClientMock.getPokemonById.mockResolvedValue(mockPikachu);
 
-      expect(response.body.pokemon.pokemonId).toBe(25);
-      expect(response.body.pokemon.name).toBe('pikachu');
-      expect(response.body.pokeApiData).toEqual(mockPikachu);
-      expect(pokemonClientMock.getPokemonById).toHaveBeenCalledWith(25);
-    });
-
-    it('debería agregar un pokemon a un usuario por nombre', async () => {
-      const userRepo = dataSource.getRepository(User);
-      const user = await userRepo.save({
-        name: 'Pokemon Trainer',
-        email: 'trainer2@test.com',
-        password: 'password123',
+        await request(app.getHttpServer())
+          .post('/users/999/pokemons')
+          .send({ pokemonId: 25 })
+          .expect(404);
       });
 
-      pokemonClientMock.getPokemonByName.mockResolvedValue(mockCharizard);
+      it('debería retornar 409 cuando el usuario ya tiene el pokemon', async () => {
+        const userRepo = dataSource.getRepository(User);
 
-      const response = await request(app.getHttpServer())
-        .post(`/users/${user.id}/pokemons`)
-        .send({ pokemonName: 'charizard' })
-        .expect(201);
+        // Guardamos el user con el ID ya presente en el array
+        const user = await userRepo.save({
+          name: 'Pokemon Trainer',
+          email: 'trainer3@test.com',
+          password: 'password123',
+          pokemons: [25], // ya tiene el pokemon 25
+        });
 
-      expect(response.body.pokemon.pokemonId).toBe(6);
-      expect(response.body.pokemon.name).toBe('charizard');
-      expect(pokemonClientMock.getPokemonByName).toHaveBeenCalledWith('charizard');
-    });
+        pokemonClientMock.getPokemonById.mockResolvedValue(mockPikachu);
 
-    it('debería retornar 404 cuando el usuario no existe', async () => {
-      pokemonClientMock.getPokemonById.mockResolvedValue(mockPikachu);
-
-      await request(app.getHttpServer())
-        .post('/users/999/pokemons')
-        .send({ pokemonId: 25 })
-        .expect(404);
-    });
-
-    it('debería retornar 409 cuando el usuario ya tiene el pokemon', async () => {
-      const userRepo = dataSource.getRepository(User);
-      const pokemonRepo = dataSource.getRepository(Pokemon);
-      const user = await userRepo.save({
-        name: 'Pokemon Trainer',
-        email: 'trainer3@test.com',
-        password: 'password123',
+        await request(app.getHttpServer())
+          .post(`/users/${user.id}/pokemons`)
+          .send({ pokemonId: 25 })
+          .expect(409);
       });
-
-      // Agregar pokemon directamente
-      await pokemonRepo.save({
-        userId: user.id,
-        pokemonId: 25,
-        name: 'pikachu',
-      });
-
-      pokemonClientMock.getPokemonById.mockResolvedValue(mockPikachu);
-
-      await request(app.getHttpServer())
-        .post(`/users/${user.id}/pokemons`)
-        .send({ pokemonId: 25 })
-        .expect(409);
-    });
   });
 
+  // ---------------------- GET /users/:id/pokemons ----------------------
   describe('/users/:id/pokemons (GET)', () => {
-    it('debería retornar los pokemones de un usuario', async () => {
+    it('debería retornar los pokemones (IDs) de un usuario', async () => {
       const userRepo = dataSource.getRepository(User);
-      const pokemonRepo = dataSource.getRepository(Pokemon);
+
       const user = await userRepo.save({
         name: 'Pokemon Trainer',
         email: 'trainer4@test.com',
         password: 'password123',
+        pokemons: [25, 6],
       });
-
-      await pokemonRepo.save([
-        { userId: user.id, pokemonId: 25, name: 'pikachu' },
-        { userId: user.id, pokemonId: 6, name: 'charizard' },
-      ]);
 
       const response = await request(app.getHttpServer())
         .get(`/users/${user.id}/pokemons`)
         .expect(200);
 
+      // Ahora la ruta devuelve un array de números
+      expect(Array.isArray(response.body)).toBeTruthy();
       expect(response.body).toHaveLength(2);
-      expect(response.body[0].pokemonId).toBe(25);
-      expect(response.body[1].pokemonId).toBe(6);
+      expect(response.body).toEqual(expect.arrayContaining([25, 6]));
     });
 
     it('debería retornar 404 cuando el usuario no existe', () => {
@@ -312,22 +293,19 @@ describe('UsersController (e2e)', () => {
     });
   });
 
+  // ---------------------- GET /users/:id/pokemons/details ----------------------
   describe('/users/:id/pokemons/details (GET)', () => {
     it('debería retornar pokemones con detalles de la PokeAPI', async () => {
       const userRepo = dataSource.getRepository(User);
-      const pokemonRepo = dataSource.getRepository(Pokemon);
+
       const user = await userRepo.save({
         name: 'Pokemon Trainer',
         email: 'trainer5@test.com',
         password: 'password123',
+        pokemons: [25, 6],
       });
 
-      await pokemonRepo.save([
-        { userId: user.id, pokemonId: 25, name: 'pikachu' },
-        { userId: user.id, pokemonId: 6, name: 'charizard' },
-      ]);
-
-      // Mock de las respuestas de PokeAPI
+      // Mock de las llamadas a la PokeAPI (orden corresponde a los IDs)
       pokemonClientMock.getPokemonById
         .mockResolvedValueOnce(mockPikachu)
         .mockResolvedValueOnce(mockCharizard);
@@ -336,52 +314,60 @@ describe('UsersController (e2e)', () => {
         .get(`/users/${user.id}/pokemons/details`)
         .expect(200);
 
+      // La ruta devuelve un array con los objetos PokeApiPokemon (según tu repo/service)
       expect(response.body).toHaveLength(2);
-      expect(response.body[0].details).toEqual(mockPikachu);
-      expect(response.body[1].details).toEqual(mockCharizard);
+      expect(response.body[0]).toEqual(mockPikachu);
+      expect(response.body[1]).toEqual(mockCharizard);
       expect(pokemonClientMock.getPokemonById).toHaveBeenCalledTimes(2);
+      expect(pokemonClientMock.getPokemonById).toHaveBeenCalledWith(25);
+      expect(pokemonClientMock.getPokemonById).toHaveBeenCalledWith(6);
     });
   });
 
-  describe('/users/:id/pokemons/:pokemonId (DELETE)', () => {
-    it('debería eliminar un pokemon de un usuario', async () => {
-      const userRepo = dataSource.getRepository(User);
-      const pokemonRepo = dataSource.getRepository(Pokemon);
-      const user = await userRepo.save({
-        name: 'Pokemon Trainer',
-        email: 'trainer6@test.com',
-        password: 'password123',
-      });
+  // ---------------------- DELETE /users/:id/pokemons/:pokemonId ----------------------
+describe('/users/:id/pokemons/:pokemonId (DELETE)', () => {
 
-      await pokemonRepo.save({
-        userId: user.id,
-        pokemonId: 25,
-        name: 'pikachu',
-      });
+  it('debería eliminar un pokemon de un usuario', async () => {
 
-      await request(app.getHttpServer())
-        .delete(`/users/${user.id}/pokemons/25`)
-        .expect(200);
+    const userRepo = dataSource.getRepository(User);
 
-      // Verificar que fue eliminado
-      const pokemons = await pokemonRepo.find({
-        where: { userId: user.id, pokemonId: 25 },
-      });
-      expect(pokemons).toHaveLength(0);
+    const user = await userRepo.save({
+      name: 'Pokemon Trainer',
+      email: 'trainer6@test.com',
+      password: 'password123',
+      pokemons: [25],
+
     });
 
-    it('debería retornar 404 cuando el pokemon no existe', async () => {
-      const userRepo = dataSource.getRepository(User);
-      const user = await userRepo.save({
-        name: 'Pokemon Trainer',
-        email: 'trainer7@test.com',
-        password: 'password123',
-      });
+    await request(app.getHttpServer())
+      .delete(`/users/${user.id}/pokemons/25`)
+      .expect(200);
 
-      await request(app.getHttpServer())
-        .delete(`/users/${user.id}/pokemons/999`)
-        .expect(404);
-    });
+    const updatedUser = await userRepo.findOneBy({ id: user.id });
+
+    expect(updatedUser?.pokemons).not.toContain(25);
+    
   });
+
+  it('debería retornar 404 cuando el pokemon no existe en el usuario', async () => {
+
+    const userRepo = dataSource.getRepository(User);
+
+    const user = await userRepo.save({
+      name: 'Pokemon Trainer',
+      email: 'trainer7@test.com',
+      password: 'password123',
+      pokemons: [], // vacío
+    });
+
+    await request(app.getHttpServer())
+      .delete(`/users/${user.id}/pokemons/999`)
+      .expect(404);
+
+  });
+});
+
+
+  
 });
 

@@ -7,7 +7,7 @@ import { App } from 'supertest/types';
 import { UsersModule } from '../src/users/users.module';
 import { PokemonClient } from '../src/clients/pokemon.client';
 import { User } from '../src/users/entities/user.entity';
-import { Pokemon } from '../src/users/entities/pokemon.entity';
+
 
 /**
  * Configuración de la base de datos para testing
@@ -21,7 +21,7 @@ export function getTestDatabaseConfig() {
     password: process.env.DB_TEST_PASSWORD || 'postgres',
     database: process.env.DB_TEST_DATABASE || 'users_db_test',
  
-    entities: [User, Pokemon],
+    entities: [User],
     synchronize: true, // Solo para testing - recrea el schema
     dropSchema: true, // Limpia la BD antes de cada test suite
   };
@@ -66,7 +66,6 @@ export async function initializeTestApp(
  */
 export async function cleanDatabase(dataSource: DataSource): Promise<void> {
   if (dataSource && dataSource.isInitialized) {
-    await dataSource.query('TRUNCATE TABLE pokemons CASCADE');
     await dataSource.query('TRUNCATE TABLE users CASCADE');
   }
 }

@@ -70,26 +70,29 @@ export class UsersController {
       type: 'object',
       properties: {
         pokemonId: { type: 'number', description: 'ID del pokemon en la PokeAPI (ej: 25)' },
-        pokemonName: { type: 'string', description: 'Nombre del pokemon (ej: "pikachu")' }
       },
       oneOf: [
         { required: ['pokemonId'] },
-        { required: ['pokemonName'] }
       ]
     }
   })
   @ApiResponse({ status: 201, description: 'Pokemon agregado exitosamente' })
+  @ApiResponse({status:400,description:'el servidor no pudo entender o procesar una solicitud'})
   @ApiResponse({ status: 404, description: 'Usuario o Pokemon no encontrado' })
   @ApiResponse({ status: 409, description: 'El usuario ya tiene este pokemon' })
+
   async addPokemon(
+
     @Param('id', ParseIntPipe) userId: number,
-    @Body() body: { pokemonId?: number; pokemonName?: string }
+    @Body() body: { pokemonId: number; }
   ) {
-    const pokemonIdOrName = body.pokemonId || body.pokemonName;
-    if (!pokemonIdOrName) {
+    const pokemonId = body?.pokemonId;
+   
+    if (!pokemonId) {
       throw new Error('Debe proporcionar pokemonId o pokemonName');
     }
-    return this.usersService.addPokemonToUser(userId, pokemonIdOrName);
+
+    return this.usersService.addPokemonToUser(userId, pokemonId);
   }
 
   @Get(':id/pokemons')
@@ -106,9 +109,10 @@ export class UsersController {
   @ApiParam({ name: 'id', type: Number, description: 'ID del usuario' })
   @ApiResponse({ status: 200, description: 'Lista de pokemones con detalles completos' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+
   async getUserPokemonsWithDetails(@Param('id', ParseIntPipe) userId: number) {
     return this.usersService.getUserPokemonsWithDetails(userId);
-  }
+  }   // aca hay que resolver el asunto 
 
   @Delete(':id/pokemons/:pokemonId')
   @ApiOperation({ summary: 'Eliminar un pokemon de un usuario' })
@@ -116,6 +120,8 @@ export class UsersController {
   @ApiParam({ name: 'pokemonId', type: Number, description: 'ID del pokemon en la PokeAPI' })
   @ApiResponse({ status: 200, description: 'Pokemon eliminado exitosamente' })
   @ApiResponse({ status: 404, description: 'Usuario o Pokemon no encontrado' })
+
+  
   async removePokemon(
     @Param('id', ParseIntPipe) userId: number,
     @Param('pokemonId', ParseIntPipe) pokemonId: number

@@ -29,15 +29,15 @@ export interface PokeApiPokemon {
 @Injectable()
 export class PokemonClient {
   private readonly baseUrl = process.env.POKEAPI_BASE_URL || 'https://pokeapi.co/api/v2';  
-
   constructor(private readonly httpService: HttpService) {}
 
-  async getPokemonById(id: number): Promise<PokeApiPokemon> {
+  async getPokemonById(id: Number): Promise<PokeApiPokemon> {
     try {
       const response = await firstValueFrom(
         this.httpService.get<PokeApiPokemon>(`${this.baseUrl}/pokemon/${id}`)
       );
       return response.data;
+
     } catch (error) {
       if (error.response?.status === 404) {
         throw new HttpException(
