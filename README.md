@@ -5,14 +5,14 @@
 **Features**:
 - **API REST**: CRUD de usuarios.
 - **Gestión de pokemones por usuario**: asociar, listar (con o sin detalles desde la PokeAPI) y eliminar pokemones de un usuario.
-- **Validaciones**: clases y DTOs (class-validator / class-transformer).
+-**Validaciones**: dependencias para validación incluidas (class-validator / class-transformer).
 - **Integración externa**: llamadas a la PokeAPI usando `@nestjs/axios` / `axios`.
 - **Testing**: pruebas unitarias y e2e con `jest` y `supertest`.
 - **Contenerización**: `Docker` + `docker-compose` para levantar servicios dependientes.
 
-**Prerequisitos / Pre-requisitos**:
+**Pre-requisitos**:
 - **Node.js** (recomendado v18+)
-- **pnpm** (o `npm`/`yarn` si prefiere) — el repo indica `pnpm` en `package.json`.
+- **npm** (o `pnpm`/`yarn` si prefiere) — el repo indica `pnpm` en `package.json`.
 - **Docker & Docker Compose** (si se desea ejecutar con contenedores).
 - **PostgreSQL** (si no utiliza Docker para la DB).
 
@@ -26,7 +26,11 @@
   ```bash
   pnpm install
   ```
-- Crear un archivo de variables de entorno: copiar `example.env` a `.env` o usar `.env.example` proporcionado.
+
+**Variables de entorno**:
+
+- Archivo de ejemplo: `example.env` 
+Debe crear un `.env` copiando ese archivo y ajustar valores según su entorno.
 
 **Ejecutar la aplicación (desarrollo)**:
 - Usando Nest (watch):
@@ -46,8 +50,7 @@
   ```
 - Para pruebas de integración / entorno de test hay `docker-compose.test.yml` y el script `up_test.sh`.
 
-**Variables de entorno**:
-- Archivo de ejemplo: `example.env` (también se incluye `.env.example`). Debe crear un `.env` copiando ese archivo y ajustar valores según su entorno.
+
 
 **Rutas / Endpoints principales**:
 - `GET /api` : UI de Swagger con la documentación interactiva de la API.
@@ -107,16 +110,4 @@
 - Manejo de colisiones de email: revisar que el repositorio/devuelva errores con códigos HTTP correctos (409 Conflict) y mensajes consistentes.
 - Faltan DTOs para body request (uso de `Omit<User, 'id' | 'createdAt'>` en controlador mezcla entidad y contrato de entrada).
 
-**Swagger / Documentación**:
-- El proyecto incluye decoradores de `@nestjs/swagger` en controladores y entidades; se puede exponer una UI de Swagger (p. ej. `/api` o `/docs`) si se configura en `main.ts`.
 
-**Contribuir**:
-- Fork & PR con pruebas y lint passing.
-
-**Licencia**: Ninguna específica en `package.json` (UNLICENSED). Añadir licencia si es necesario.
-
----
-
-**Contacto / Soporte**: Abrir issues en el repositorio con reproducible steps y logs.
-
-**Notas finales**: Este README resume el estado actual del proyecto y los pasos rápidos para levantar, probar y contribuir. Si quieres, puedo añadir un apartado de ejemplos de requests (curl / HTTPie / Postman collection) o generar `Dockerfile` / `docker-compose` mínimos para despliegue.
