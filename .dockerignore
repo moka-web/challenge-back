@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+.git
+.gitignore
+.env
+.env.local
+.vscode
+.idea
+npm-debug.log
+coverage
+.DS_Store
+pnpm-lock.yaml
+npm-debug.log*
+yarn-error.log
+/.history
+/*.log
