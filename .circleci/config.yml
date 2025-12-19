@@ -4,23 +4,24 @@ orbs:
   node: circleci/node@5.0.2
 
 jobs:
-  build_and_test: # this can be any name you choose
-    executor: node/default # use the default executor defined within the orb
+  build_and_test:
+    executor: node/default
     steps:
       - checkout
       - node/install-packages:
-          pkg-manager: npm
+          pkg-manager: pnpm
       - run:
-          command: npm run test
           name: Run tests
+          command: pnpm test
       - run:
-          command: npm run build
           name: Build app
+          command: pnpm build
       - persist_to_workspace:
           root: ~/project
           paths:
             - .
+
 workflows:
-  build_test_deploy: # this can be any name you choose
+  build_test_deploy:
     jobs:
       - build_and_test
