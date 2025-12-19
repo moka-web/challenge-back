@@ -8,8 +8,12 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: pnpm
+      - run:
+          name: Install pnpm
+          command: npm install -g pnpm
+      - run:
+          name: Install dependencies with pnpm
+          command: pnpm install --frozen-lockfile
       - run:
           name: Run tests
           command: pnpm test
