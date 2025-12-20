@@ -13,7 +13,7 @@ jobs:
           command: npm install pnpm
       - run:
           name: Install dependencies with pnpm
-          command: pnpm install --frozen-lockfile
+          command: pnpm install 
       - run:
           name: Run tests
           command: pnpm test
