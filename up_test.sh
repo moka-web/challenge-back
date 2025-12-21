@@ -1,2 +1,4 @@
-#aqui va el comando que se utilizara para levantar el contenedor de testing 
-docker-compose -f docker-compose.yml -f docker-compose.test.yml up --build postgres_test api
+#este comando levanta el contenedor de la api con la base de datos de prod + la base de datos de test. 
+#esto hay que cambiarlo para que levante solo la base de datos de test.
+docker-compose  -f docker-compose.test.yml up --build 
+docker-compose -f docker-compose.test.yml down -v

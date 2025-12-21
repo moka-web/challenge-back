@@ -4,7 +4,6 @@ import { App } from 'supertest/types';
 import { DataSource } from 'typeorm';
 import { PokemonClient } from '../src/clients/pokemon.client';
 import { User } from '../src/users/entities/user.entity';
-
 import {
   createTestModule,
   initializeTestApp,

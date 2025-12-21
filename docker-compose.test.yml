@@ -1,19 +1,39 @@
-# docker-compose.test.yml (Extensión para Testing)
 services:
-  postgres_test:
-    image: postgres:15-alpine
-    container_name: users_db_test
-    # Usar credenciales distintas
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy  # Esto evita el error de conexión al inicio
+    ports:
+      - "3000:3000"
     environment:
-      POSTGRES_DB: users_db_test
+      # Mapeamos las variables exactas que busca tu función getTestDatabaseConfig()
+      DB_TEST_HOST: postgres
+      DB_TEST_PORT: 5432        # Puerto interno de la red de Docker
+      DB_TEST_USERNAME: postgres
+      DB_TEST_PASSWORD: postgres
+      DB_TEST_DATABASE: users_db_test
+      NODE_ENV: test
+    command: ["sh", "-c", "npm run test:e2e -- --runInBand"]
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db_test
+    environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    # Usar un puerto diferente al 5432 del base para evitar conflicto
+      POSTGRES_DB: users_db_test
     ports:
-      - "5433:5432"
+      - "5433:5432" # Para que tú puedas entrar desde fuera por el 5433
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d users_db_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
     volumes:
-      # Usar un volumen de datos diferente
-      - postgres_test_data:/var/lib/postgresql/data
+      - postgres_data_test:/var/lib/postgresql/data
 
 volumes:
-  postgres_test_data:
+  postgres_data_test:

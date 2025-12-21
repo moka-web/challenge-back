@@ -16,7 +16,7 @@ jobs:
           command: pnpm install --no-frozen-lockfile
       - run:
           name: Run tests
-          command: pnpm test:e2e
+          command: pnpm test
       - run:
           name: Build app
           command: pnpm build

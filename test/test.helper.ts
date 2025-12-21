@@ -12,6 +12,8 @@ import { User } from '../src/users/entities/user.entity';
 /**
  * Configuración de la base de datos para testing
  */
+
+
 export function getTestDatabaseConfig() {
   return {
     type: 'postgres' as const,

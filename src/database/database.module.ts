@@ -5,7 +5,9 @@ import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
+
     TypeOrmModule.forRoot({
+      
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -15,7 +17,9 @@ import { User } from '../users/entities/user.entity';
       entities: [User],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
+
   ],
+
   exports: [TypeOrmModule],
 })
 export class DatabaseModule {}
