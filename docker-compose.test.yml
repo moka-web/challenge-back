@@ -9,7 +9,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Mapeamos las variables exactas que busca tu función getTestDatabaseConfig()
       DB_TEST_HOST: postgres
       DB_TEST_PORT: 5432        # Puerto interno de la red de Docker
       DB_TEST_USERNAME: postgres
