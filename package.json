@@ -15,7 +15,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage --config ./test/jest-e2e.json",
+    "test:cov": "COVERALLS_REPO_TOKEN=7qZMP1c90wYaBGaQMfbk6nY7lmDMKvJTG && jest --coverage --config ./test/jest-e2e.json && coveralls < coverage/lcov.info ",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:integration": "jest --config ./test/jest-e2e.json --testPathPattern=users.e2e-spec.ts"
