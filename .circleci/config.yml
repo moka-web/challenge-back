@@ -9,12 +9,20 @@ jobs:
   build_and_test:
 
     docker:
-      - image: cimg/node:20.0.0
-      - image: cimg/postgres:15.0
+      - image: cimg/node:20.19.4
+        environment:
+          DB_HOST: postgres
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: users_db_test
+
+      - image: postgres:15-alpine
         environment:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: users_db_test
+
     executor: node/default
     steps:
       - checkout
