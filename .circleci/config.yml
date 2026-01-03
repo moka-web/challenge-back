@@ -11,13 +11,14 @@ jobs:
     docker:
       - image: cimg/node:20.19.4
         environment:
-          DB_HOST: 0.0.0.0
-          DB_PORT: 5433:5432
+          DB_HOST: postgres
+          DB_PORT: 5432
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
           DB_DATABASE: users_db_test
 
       - image: postgres:15-alpine
+        name: postgres
         environment:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -31,6 +32,11 @@ jobs:
       - run:
           name: Install dependencies with pnpm (allow lockfile update)
           command: pnpm install --no-frozen-lockfile
+      - run:
+          name: Wait for Postgres to be ready
+          command: |
+            echo "Waiting for Postgres..."
+            sleep 10    
       - run:
           name: Run tests
           command: pnpm test:e2e
