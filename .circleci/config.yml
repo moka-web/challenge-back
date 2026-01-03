@@ -3,9 +3,25 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.2
   coveralls: coveralls/coveralls@2.2.5
+  
 
 jobs:
   build_and_test:
+
+    docker:
+      - image: cimg/node:20.0.0
+      - image: cimg/postgres:15.0
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: users_db_test
+        command: ["postgres", "-c", "fsync=off"]  # Mejora el rendimiento en tests
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres -d users_db_test"]
+          interval: 3s
+          timeout: 3s
+          retries: 10
+
     executor: node/default
     steps:
       - checkout
