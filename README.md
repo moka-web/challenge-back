@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/moka-web/challenge-back/tree/main.svg?style=shield)](https://app.circleci.com/pipelines/github/moka-web/challenge-back) [![NestJS](https://img.shields.io/badge/NestJS-%23E0234E?logo=nestjs&logoColor=white)](https://nestjs.com) [![TypeORM](https://img.shields.io/badge/TypeORM-%230073AF?logo=typeorm&logoColor=white)](https://typeorm.io) [![Postgres](https://img.shields.io/badge/PostgreSQL-%23316192?logo=postgresql&logoColor=white)](https://www.postgresql.org) [![Docker](https://img.shields.io/badge/Docker-%230db7ed?logo=docker&logoColor=white)](https://www.docker.com) [![Jest](https://img.shields.io/badge/Jest-%23C21325?logo=jest&logoColor=white)](https://jestjs.io) [![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Coverage Status](https://coveralls.io/repos/github/moka-web/challenge-back/badge.svg)](https://coveralls.io/github/moka-web/challenge-back)
 
 **App Name**: **Back Challenge (back-challenge)**
 
