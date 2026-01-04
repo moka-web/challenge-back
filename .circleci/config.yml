@@ -43,7 +43,7 @@ jobs:
           command: pnpm test:cov
       - coveralls/upload:
           token: COVERALLS_REPO_TOKEN
-          base_path: test/coverage/
+          base_path: test/coverage/lcov.info
          
 
       - run:
