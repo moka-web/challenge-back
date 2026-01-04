@@ -24,7 +24,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: users_db_test
-        executor: node/default
+          executor: node/default
         steps:
           - checkout
           - run:
