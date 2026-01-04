@@ -7,7 +7,6 @@ orbs:
 
 jobs:
   build_and_test:
-
     docker:
       - image: cimg/node:20.19.4
         environment:
@@ -17,6 +16,7 @@ jobs:
           DB_TEST_PASSWORD: postgres
           DB_TEST_DATABASE: users_db_test
           NODE_ENV: test
+          
 
       - image: postgres:15-alpine
         name: postgres
