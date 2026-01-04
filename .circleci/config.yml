@@ -24,33 +24,35 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: users_db_test
-    executor: node/default
-    steps:
-      - checkout
-      - run:
-          name: Install pnpm
-          command: npm install pnpm
-      - run:
-          name: Install dependencies with pnpm (allow lockfile update)
-          command: pnpm install --no-frozen-lockfile
-      - run:
-          name: Wait for Postgres to be ready
-          command: |
-            echo "Waiting for Postgres..."
-            sleep 10    
-      - run:
-          name: Run tests
-          command: pnpm test:e2e
-      - run:
-          name: Run tests with coverage
-          command: pnpm test:cov
-      - run:
-          name: Build app
-          command: pnpm build     
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - .
+        executor: node/default
+        steps:
+          - checkout
+          - run:
+              name: Install pnpm
+              command: npm install pnpm
+          - run:
+              name: Install dependencies with pnpm (allow lockfile update)
+              command: pnpm install --no-frozen-lockfile
+          - run:
+              name: Wait for Postgres to be ready
+              command: |
+                echo "Waiting for Postgres..."
+                sleep 10    
+          - run:
+              name: Run tests
+              command: pnpm test:e2e
+          - run:
+              name: Run tests with coverage
+              command: pnpm test:cov
+          - coveralls/upload
+  
+          - run:
+              name: Build app
+              command: pnpm build     
+          - persist_to_workspace:
+              root: ~/project
+              paths:
+                - .
 
 workflows:
   build_test_deploy:
