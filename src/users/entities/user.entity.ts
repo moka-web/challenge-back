@@ -38,13 +38,12 @@ export class User {
     type: [Number],
   })
 
-  // @Column({ type: 'jsonb', nullable: true })
-  // pokemons: number[];
-
-
   @Column('int', { array: true, default: [] })
   pokemons: number[];
 
+  @ApiProperty({ description: 'Color favorito del usuario', example: 'Azul' })
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  favouriteColor: string | null;
 
 }
 
