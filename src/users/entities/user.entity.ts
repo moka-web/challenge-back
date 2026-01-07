@@ -41,9 +41,9 @@ export class User {
   @Column('int', { array: true, default: [] })
   pokemons: number[];
 
-  @ApiProperty({ description: 'Color favorito del usuario', example: 'Azul' })
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  favouriteColor: string | null;
+  // @ApiProperty({ description: 'Color favorito del usuario', example: 'Azul' })
+  // @Column({ type: 'varchar', length: 100, nullable: true })
+  // favouriteColor: string | null;
 
 }
 

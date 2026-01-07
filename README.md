@@ -109,9 +109,40 @@
 - Añadir validaciones y límites en las llamadas a la PokeAPI (caching / rate-limit).
 - Añadir cobertura CI (GitHub Actions / GitLab CI) para ejecutar tests y lint.
 
+
 **⚠️ Errores conocidos / Puntos a corregir**:
 - El endpoint `POST /users/:id/pokemons` lanza `throw new Error('Debe proporcionar pokemonId o pokemonName')` — debería lanzar una excepción HTTP adecuada (`BadRequestException`) para que Nest la formatee correctamente.
 - Manejo de colisiones de email: revisar que el repositorio/devuelva errores con códigos HTTP correctos (409 Conflict) y mensajes consistentes.
 - Faltan DTOs para body request (uso de `Omit<User, 'id' | 'createdAt'>` en controlador mezcla entidad y contrato de entrada).
+
+**🔁 Migraciones**:
+
+- **Ubicación**: las migraciones TypeORM se encuentran en `src/database/migrations` (ej.: `src/database/migrations/1767677414604-tomasMig.ts`).
+- **Archivo de configuración (DataSource)**: la configuración de TypeORM está en `src/database/data-source.ts` y exporta `AppDataSource`. Al compilar el proyecto, el CLI de TypeORM apunta a `dist/database/data-source.js`.
+
+- **Scripts disponibles** (definidos en `package.json`):
+  - `pnpm run create-migration -- <path>` : crea una nueva migración (usa el CLI de TypeORM). Ejemplo:
+    ```bash
+    pnpm run create-migration -- ./src/database/migrations/my-new-migration
+    ```
+  - `pnpm run aply-migrations-up` : compila (`pnpm build`) y aplica las migraciones sobre `dist/database/data-source.js`.
+    ```bash
+    pnpm run aply-migrations-up
+    ```
+  - `pnpm run aply-migrations-down` : compila y revierte la última migración (revert).
+    ```bash
+    pnpm run aply-migrations-down
+    ```
+
+- **Flujo recomendado**:
+  1. Crear o modificar entidades en `src/`.
+  2. Generar la migración (según el flujo de su CLI TypeORM). Si prefiere generar automáticamente a partir de cambios, puede usar `migration:generate` (configurar el parámetro `-d` al `data-source` correspondiente cuando aplique desde `dist/`).
+  3. Compilar el proyecto si usará los scripts provistos (`pnpm run aply-migrations-up` ejecuta `pnpm build` internamente).
+  4. Ejecutar `pnpm run aply-migrations-up` para aplicar las migraciones en la base de datos objetivo.
+
+- **Notas**:
+  - El proyecto está configurado para buscar migraciones compiladas en `dist/database/migrations/*.js` (ver `migrations` en `src/database/data-source.ts`).
+  - Asegúrese de tener las variables de entorno de conexión (`DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`) correctamente configuradas antes de ejecutar las migraciones.
+  - Si prefiere ejecutar migraciones sin compilar, puede invocar el CLI de TypeORM con `ts-node`/`ts-node/register` y apuntar al `src/database/data-source.ts` (requiere instalación/configuración adicional).
 
 

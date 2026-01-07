@@ -9,8 +9,9 @@
     "build": "nest build",
     "migrate:build": "pnpm build",
     
-    "create-migration": "typeorm migration:create ./src/database/migrations/addFavouriteColor",
-
+    "_comment": " en consola pnpm create-migration './src/database/migrations/migration' ",
+    "create-migration": "typeorm migration:create",  
+    
     "aply-migrations-up": "pnpm migrate:build && typeorm migration:run -d dist/database/data-source.js",
     "aply-migrations-down":"pnpm migrate:build && typeorm migration:revert -d dist/database/data-source.js",
     
