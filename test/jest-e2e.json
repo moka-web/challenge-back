@@ -1,15 +1,21 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
-
+  "moduleFileExtensions": ["ts", "js", "json"],
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/../src/$1"
   },
-  
+  "extensionsToTreatAsEsm": [],
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": ["ts-jest", {
+      "tsconfig": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
+      }
+    }]
   },
   "testTimeout": 30000
 }
