@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from './data-source';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions as any)],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions)],
   exports: [TypeOrmModule],
 })
 export class DatabaseModule {}
