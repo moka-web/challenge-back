@@ -13,10 +13,12 @@
     "create-migration": "typeorm migration:create",  
     
     "aply-migrations-up": "pnpm migrate:build && typeorm migration:run -d dist/database/data-source.js",
-    "aply-migrations-down":"pnpm migrate:build && typeorm migration:revert -d dist/database/data-source.js",
-    
-    
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+      "aply-migrations-down":"pnpm migrate:build && typeorm migration:revert -d dist/database/data-source.js",
+
+      "seed:run": "ts-node -r tsconfig-paths/register src/scripts/run-single-migration.ts src/database/migrations/seed-migrations/1767677414605-seed-users.ts",
+      "seed:run:dist": "pnpm migrate:build && node dist/scripts/run-single-migration.js dist/database/migrations/seed-migrations/1767677414605-seed-users.js",
+      "seed": "SET \"NODE_ENV=development\" && IF \"%NODE_ENV%\"==\"development\" ( pnpm run seed:run ) ELSE ( echo \"Seed migrations are only allowed in development environment.\" && exit 1 )",
+      "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
