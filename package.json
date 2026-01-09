@@ -12,8 +12,8 @@
     "_comment": " en consola pnpm create-migration './src/database/migrations/migration' ",
     "create-migration": "typeorm migration:create",  
     
-    "aply-migrations-up": "pnpm migrate:build && typeorm migration:run -d dist/database/data-source.js",
-      "aply-migrations-down":"pnpm migrate:build && typeorm migration:revert -d dist/database/data-source.js",
+    "aply-migrations-up": "pnpm migrate:build && typeorm migration:run -d dist/database/datasource.js",
+      "aply-migrations-down":"pnpm migrate:build && typeorm migration:revert -d dist/database/datasource.js",
 
       "seed:run": "ts-node -r tsconfig-paths/register src/scripts/run-single-migration.ts src/database/migrations/seed-migrations/1767677414605-seed-users.ts",
       "seed:run:dist": "pnpm migrate:build && node dist/scripts/run-single-migration.js dist/database/migrations/seed-migrations/1767677414605-seed-users.js",

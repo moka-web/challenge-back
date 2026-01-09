@@ -134,7 +134,7 @@ Las migraciones TypeORM se encuentran en `src/database/migrations` (ej.: `src/da
 
 ### Archivo de configuración (DataSource)
 
-La configuración de TypeORM está en `src/database/data-source.ts` y exporta `AppDataSource`. Al compilar el proyecto, el CLI de TypeORM apunta a `dist/database/data-source.js`.
+La configuración de TypeORM está en `src/database/datasource.ts` y exporta `AppDataSource`. Al compilar el proyecto, el CLI de TypeORM apunta a `dist/database/datasource.js`.
 
 ### Scripts disponibles (definidos en `package.json`)
 
@@ -145,7 +145,7 @@ La configuración de TypeORM está en `src/database/data-source.ts` y exporta `A
   pnpm run create-migration -- ./src/database/migrations/my-new-migration
   ```
 
-- `pnpm run aply-migrations-up`: Compila (`pnpm build`) y aplica las migraciones sobre `dist/database/data-source.js`.
+- `pnpm run aply-migrations-up`: Compila (`pnpm build`) y aplica las migraciones sobre `dist/database/datasource.js`.
   ```bash
   pnpm run aply-migrations-up
   ```
@@ -158,7 +158,7 @@ La configuración de TypeORM está en `src/database/data-source.ts` y exporta `A
 ### Flujo recomendado
 
 1. Crear o modificar entidades en `src/`.
-2. Generar la migración. Si prefiere generar automáticamente a partir de cambios, puede usar `migration:generate` (configurar el parámetro `-d` al `data-source` correspondiente cuando aplique desde `dist/`).
+2. Generar la migración. Si prefiere generar automáticamente a partir de cambios, puede usar `migration:generate` (configurar el parámetro `-d` al `datasource` correspondiente cuando aplique desde `dist/`).
 3. Compilar el proyecto si usará los scripts provistos (`pnpm run aply-migrations-up` ejecuta `pnpm build` internamente).
 4. Ejecutar `pnpm run aply-migrations-up` para aplicar las migraciones de esquema en la base de datos objetivo.
 5. **Para ejecutar seed migrations (solo en desarrollo)**:
@@ -169,6 +169,6 @@ La configuración de TypeORM está en `src/database/data-source.ts` y exporta `A
 
 ### Notas
 
-- El proyecto está configurado para buscar migraciones compiladas en `dist/database/migrations/*.js` (ver `migrations` en `src/database/data-source.ts`).
+- El proyecto está configurado para buscar migraciones compiladas en `dist/database/migrations/*.js` (ver `migrations` en `src/database/datasource.ts`).
 - Asegúrese de tener las variables de entorno de conexión (`DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`) correctamente configuradas antes de ejecutar las migraciones.
-- Si prefiere ejecutar migraciones sin compilar, puede invocar el CLI de TypeORM con `ts-node`/`ts-node/register` y apuntar al `src/database/data-source.ts` (requiere instalación/configuración adicional).
+- Si prefiere ejecutar migraciones sin compilar, puede invocar el CLI de TypeORM con `ts-node`/`ts-node/register` y apuntar al `src/database/datasource.ts` (requiere instalación/configuración adicional).
